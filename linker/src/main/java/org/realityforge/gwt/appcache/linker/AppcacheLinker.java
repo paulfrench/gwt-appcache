@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -266,28 +267,28 @@ public final class AppcacheLinker
       final HashSet<String> completed = new HashSet<String>();
 
       final List<SelectionDescriptor> selectors = permutation.getSelectors();
-      final SelectionDescriptor firstSelector = selectors.iterator().next();
-      for ( final BindingProperty p : firstSelector.getBindingProperties() )
+      final Iterator<SelectionDescriptor> iterator = selectors.iterator();
+      while(iterator.hasNext())
       {
-        final String key = p.getName();
-        if ( !completed.contains( key ) )
+        for ( final BindingProperty p : iterator.next().getBindingProperties() )
         {
-          final HashSet<String> values = collectValuesForKey( selectors, key );
-          if ( 1 == selectors.size() || values.size() > 1 )
+          final String key = p.getName();
+          if ( !completed.contains( key ) )
           {
+            final HashSet<String> values = collectValuesForKey( selectors, key );
             calculatedBindings.add( new BindingProperty( key, joinValues( values ) ) );
+            completed.add( key );
           }
-          completed.add( key );
         }
-      }
-      Collections.sort( calculatedBindings, new Comparator<BindingProperty>()
-      {
-        @Override
-        public int compare( final BindingProperty o1, final BindingProperty o2 )
+        Collections.sort( calculatedBindings, new Comparator<BindingProperty>()
         {
-          return o2.getComponents().length - o1.getComponents().length;
-        }
-      } );
+          @Override
+          public int compare( final BindingProperty o1, final BindingProperty o2 )
+          {
+            return o2.getComponents().length - o1.getComponents().length;
+          }
+        } );
+      }
       descriptors.add( new SelectionDescriptor( permutation.getPermutationName(), calculatedBindings ) );
     }
     logger.log( Type.DEBUG, "Permutation map created with " + descriptors.size() + " descriptors." );
