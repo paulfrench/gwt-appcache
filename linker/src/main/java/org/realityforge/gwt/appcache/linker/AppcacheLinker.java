@@ -273,10 +273,7 @@ public final class AppcacheLinker
         if ( !completed.contains( key ) )
         {
           final HashSet<String> values = collectValuesForKey( selectors, key );
-          if ( 1 == selectors.size() || values.size() > 1 )
-          {
-            calculatedBindings.add( new BindingProperty( key, joinValues( values ) ) );
-          }
+          calculatedBindings.add( new BindingProperty( key, joinValues( values ) ) );
           completed.add( key );
         }
       }
